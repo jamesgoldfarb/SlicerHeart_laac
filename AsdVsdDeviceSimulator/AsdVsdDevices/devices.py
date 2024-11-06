@@ -279,3 +279,52 @@ class CustomDevice(CardiacDeviceBase):
     points.InsertNextPoint(0, 0, halfLength)
 
     return points
+
+
+class WatchmanFlxDevice(CardiacDeviceBase):
+
+  NAME = "Watchman FLX"
+  ID = "WatchmanFlx"
+  RESOURCES_PATH = os.path.join(os.path.dirname(__file__), "..",  "Resources")
+
+  @classmethod
+  def getParameters(cls):
+    return {
+      'diameterMm': cls._genParameters("Diameter", "Diameter of the device", 27, "mm", 20, 35, 1, 0),
+      'lengthMm': cls._genParameters("Length", "Total length", 20, "mm", 10, 30, 1, 0),
+      'waistDiameterMm': cls._genParameters("Waist diameter", "Diameter of the waist", 20, "mm", 10, 30, 1, 0),
+      'waistLengthMm': cls._genParameters("Waist length", "Length of the waist", 10, "mm", 5, 15, 1, 0),
+      'skirtLengthFraction': cls._genParameters("Skirt length", "Percentage of skirt length relative to total length", 20, "%", 0, 200, 1, 5),
+      'skirtRadiusFraction': cls._genParameters("Skirt radius", "Percentage of radius of skirt compared to the base radius", 20, "%", 0, 200, 1, 5)
+    }
+
+  @classmethod
+  def getInternalParameters(cls):
+    return {'interpolationSmoothness': -0.70}
+
+  @staticmethod
+  def getProfilePoints(params, segment=None, openSegment=True):
+    lengthMm = params['lengthMm']
+    radiusMm = params['diameterMm'] / 2.0
+    waistRadiusMm = params['waistDiameterMm'] / 2.0
+    halfWaistLength = params['waistLengthMm'] / 2.0
+    skirtLengthFraction = params['skirtLengthFraction']
+    skirtRadiusFraction = params['skirtRadiusFraction']
+
+    points = vtk.vtkPoints()
+
+    halfLength = lengthMm * 0.5
+
+    # Skirt
+    points.InsertNextPoint(radiusMm * (1.0 + skirtRadiusFraction), 0, -halfLength + lengthMm * skirtLengthFraction)
+
+    # Main body
+    points.InsertNextPoint(radiusMm, 0, -halfLength)
+    points.InsertNextPoint(radiusMm, 0, -halfWaistLength)
+    points.InsertNextPoint(waistRadiusMm, 0, -halfWaistLength)
+    points.InsertNextPoint(waistRadiusMm, 0, halfWaistLength)
+    points.InsertNextPoint(radiusMm, 0, halfWaistLength)
+    points.InsertNextPoint(radiusMm, 0, halfLength)
+    points.InsertNextPoint(0, 0, halfLength)
+
+    return points

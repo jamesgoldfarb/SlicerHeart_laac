@@ -17,7 +17,7 @@ class AsdVsdDeviceSimulator(ScriptedLoadableModule):
   """
 
   deviceClasses = [SeptalOccluder, MultiFenestratedSeptalOccluder,
-                   DuctOccluder, DuctOccluderII, MuscularVSDOccluder, CustomDevice]
+                   DuctOccluder, DuctOccluderII, MuscularVSDOccluder, CustomDevice, WatchmanFlxDevice]
 
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
